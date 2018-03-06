@@ -67,7 +67,7 @@ def GetReferenceDirectory(ref_dir, tf):
 
 if __name__ == '__main__':
         #Argument parsing
-        parser = argparse.ArgumentParser(description='A quick function to check for similar motifs based on TFs')
+        parser = argparse.ArgumentParser(description='A quick function to assemble necessary files for motif comparison')
         parser.add_argument("dataInput", help="Specify the path to the filtered TFs")
         parser.add_argument("dataDir", help = "Specify the directory with the found TF data")
         parser.add_argument("outFileDest", help= " The destination directory for output files")
@@ -121,5 +121,3 @@ if __name__ == '__main__':
                         print (search_key + " dir doesn't exist. Moving on.")
                     updateTrackingSet(search_key, p_motif, p_tf, tracking_set)               
         
-#This step will run on its own-- too much to try and do it all here. Let's just get it primed here.
-#compareMotifs.pl /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/MA-MA_comparison_results/AP2-EREBP-NIATv7_g01614_filtered_for_comparison.motif /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/MA-MA_comparison_results/ -known /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/MA_results/HB-NIATv7_g14998/2kb_topMatches_FORTESTING.motif -reduceThresh 0.8 -pvalue 0.001

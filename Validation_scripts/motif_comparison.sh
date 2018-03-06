@@ -1,19 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Mon March 1 18:24:16 2018
-
-@author: aomda
-"""
-
+#!/usr/bin/env bash
+#This tool will run the motif comparison of motifs against each other
 #$1 is the folder you want to step through
-
-
-for f in $1/*; do
-        if [[ -d $f ]]; then
-                #do your thing. We want to only keep 
-                cd $f
-                compareMotifs.pl ./*filtered_for_comparison.motif ./*_ref.motif -reduceThresh 0.9 -pvalue 0.001
-                cd ../            
-
-fi
+cd $1
+for d in ./* ; do
+	if [[ -d $d ]]; then
+		cd $d
+		echo $d
+		sed -i '/^$/d' ./*filtered_for_comparison.motif
+		sed -i '/^$/d' ./*_ref.motif
+		compareMotifs.pl ./*filtered_for_comparison.motif ./ -known ./*_ref.motif -reduceThresh 0.9
+		cd ../
+	fi
+done
