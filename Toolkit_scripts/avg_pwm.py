@@ -60,22 +60,21 @@ def ParseMotifFile(file_handle):
 
 
 def AdjustPWMLengthsAll(pwms, min_len):
-    for p in pwms:
-        AdjustPWMLength(p, min_len)
+    for i in range(0, len(pwms)):
+       pwms[i] =  AdjustPWMLength(pwms[i], min_len)
 
 def AdjustPWMLength(pwm, min_len):
-    EQUAL = 0.25
+    if len(pwm) +1  > min_len:
+        while len(pwm) > min_len:
+            pwm = pwm[0:-1]  #default all the values to equal probability so it will have no effect in averaging.
+        return pwm
     if len(pwm) < min_len:
-        while len(pwm) < min_len:
-            pwm.append([EQUAL,EQUAL,EQUAL,EQUAL])  #default all the values to equal probability so it will have no effect in averaging.
-    elif len(pwm) > min_len:
         print "Unexpected condition, please revisit this case..."
-    else:
-        return
+        
+    
 
 def AveragePWMs(pwm_list):
     
-    print pwm_list
     raw_input()
     return np.average(np.array(pwm_list).astype(np.float), axis = 0)
 
@@ -87,15 +86,12 @@ if __name__ == '__main__':
         args = parser.parse_args()
 
         pwm_super_list = []
-        max_length = 0
+        min_length = 100
         with open(args.pwm_paths) as p_in:
             for line in p_in:
                add_in = ParseMotifFile(line.strip())
                pwm_super_list += add_in
-               if len(add_in) > max_length:
-                   max_length = len(add_in)
-
-        AdjustPWMLengthsAll(pwm_super_list, max_length)
-
+               if len(add_in) + 1  < min_length:
+                   min_length = len(add_in) + 1
+        AdjustPWMLengthsAll(pwm_super_list, min_length)
         averaged_pwm  = AveragePWMs(pwm_super_list)
-        print averaged_pwm
