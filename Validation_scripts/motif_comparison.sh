@@ -5,6 +5,16 @@ cd $1
 for d in ./* ; do
 	if [[ -d $d ]]; then
 		cd $d
+		if [ ! -s ./*filtered_for_comparison.motif ]; then
+			cd ../
+			rm -r $d
+			continue
+		fi
+		if [ ! -s ./*_ref.motif ]; then
+			cd ../
+			rm -r $d
+			continue
+		fi	
 		echo $d
 		sed -i '/^$/d' ./*filtered_for_comparison.motif
 		sed -i '/^$/d' ./*_ref.motif

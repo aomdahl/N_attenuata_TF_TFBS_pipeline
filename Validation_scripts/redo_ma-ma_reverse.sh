@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+ 
+#This is the workflow used for both the RNA-seq and MA datasets.
+#Here I only show some of the steps for convenience
+#Extract the relevant files and condense them to the relevant directories using internal_motif_analysis.py
+#This version, made on 3/29, was run on the unfiltered data (not chosen by conservation or anything)
+python3 internal_motif_analysis.py /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/ma.12.29.TF.superTable.remade.tsv /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/RNASeq_results/ /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_MA-RNA_comparison_results/
+
+
+#Run the final script
+bash motif_comparison.sh /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_MA-RNA_comparison_results/
+bash motif_comparison.sh /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_MA-MA_comparison_results/
+
+
+#Now, we want to condense the results into a readable table. Here I use the Homer html parser I built over the summer:
+python3 ../Toolkit_scripts/HomerTools.py --dirs /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_MA-RNA_comparison_results/ > /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_results/MA-RNA-comparison_summary.tsv &
+python3 ../Toolkit_scripts/HomerTools.py --dirs /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_MA-MA_comparison_results/ > /mnt/d/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_results/MA-MA-comparison_summary.tsv &
+

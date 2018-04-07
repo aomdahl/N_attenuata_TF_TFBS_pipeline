@@ -1,0 +1,90 @@
+---
+title: "Exploring_nofilter__motif_validation_scores"
+author: "Ashton Omdahl"
+date: "March 31, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(root.dir ="D:/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_results")
+library(readr)
+library(dplyr)
+library(tidyr)
+library(magrittr)
+```
+We are looking at  the summary of our scores, trying to decide where thre threshold needs to be. I think 0.8 is probably good, will give us to TFs
+
+```{r}
+#This got deleted- need to fix it to do what we want it to -_- it (!!) that's what you get for not updating to Git consistently.
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+tf_reference_match_scores <- read_tsv("./nofilter_complete_results") %>% separate(Split, c("pTF_mod", "refTF"), "_against_") %>% separate(pTF_mod, c("pTF_family", "pTF_i"), "-N")  %>% mutate(pTF = paste0("N", pTF_i))
+print(tf_reference_match_scores)
+```
+We want to line these up with the conservation score for the motifs, and see if there is some kind of correlation between Match score and conservation score (assuming significance on those)
+
+To investigate this, we first need to merge these findings with all of our previous data -_-
+```{r}
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+ma_motifs_all <- read_tsv("ma.8.17.motifs.superTable.tsv") %T>% print()
+rna_motifs_all <- read_tsv("RNA.8.17.motifs.superTable.tsv") %T>% print()
+
+```
+Now, we want to join by matching soure resources, motif, and core gene
+First for MA, then for RNA
+```{r}
+tf_reference_match_scores %>% filter(SourceData == "MA") -> ma_based_rms
+inner_join(ma_based_rms, ma_motifs_all, by = c("Motif", "ModuleCoreGene"))  %>% rename(ValidationMatchScore = Score)%>% filter(`ConservationP-value` <= 0.001)  -> ma_motifs_backvalidated
+
+tf_reference_match_scores %>% filter(SourceData == "RNA") -> rna_based_rms
+inner_join(rna_based_rms, rna_motifs_all, by = c("Motif", "ModuleCoreGene")) %>% rename(ValidationMatchScore = Score) %>% filter(`ConservationP-value` <= 0.001) -> rna_motifs_backvalidated
+
+```
+NOW! We want to see which motifs were not only highly validated but also have good conservatino scores
+We also want to see if there is some kind of correlation between these things.
+
+```{r}
+library(ggplot2)
+ggplot(ma_motifs_backvalidated , aes(x=ConservationScore, y=ValidationMatchScore)) + geom_point()
+cor.test(ma_motifs_backvalidated$ConservationScore, ma_motifs_backvalidated$ValidationMatchScore)
+
+library(ggplot2)
+ggplot(rna_motifs_backvalidated , aes(x=ConservationScore, y=ValidationMatchScore)) + geom_point()
+cor.test(rna_motifs_backvalidated$ConservationScore, rna_motifs_backvalidated$ValidationMatchScore)
+
+```
+Perhaps if values are thresholded by Conservation  score  we see some kind of separation related to match score?
+```{r}
+cons_score_diffs <- function(cons_score){
+ma_motifs_backvalidated %>% mutate(Conserved = ifelse((ConservationScore >= cons_score), 1, 0)) -> ma_motifs_cons_threshold_validated
+t.test(filter(ma_motifs_cons_threshold_validated, Conserved ==1)$ValidationMatchScore, filter(ma_motifs_cons_threshold_validated, Conserved == 0)$ValidationMatchScore)
+}
+
+cons_score_diffs(0.8)
+cons_score_diffs(0.9)
+cons_score_diffs(0.5)
+
+```
+Interesting. It seems that there is a slight difference between these groups in match score, but not mutch- the means are pretty similar. 
+What happens if we go the other direction; that is we filter by Match score, do we see higher conservation scores?
+
+```{r}
+match_score_diffs <- function(match_score){
+ma_motifs_backvalidated %>% mutate(Validated = ifelse(ValidationMatchScore >= match_score, 1, 0)) -> ma_motifs_threshold_validated
+t.test(filter(ma_motifs_threshold_validated, Validated ==1)$ConservationScore, filter(ma_motifs_threshold_validated, Validated == 0)$ConservationScore)
+}
+
+match_score_diffs(0.8)
+match_score_diffs(0.9)
+match_score_diffs(0.5)
+
+```
+Saving some of the data for later reference
+```{r}
+library(readr)
+write_tsv(ma_motifs_backvalidated, path ="D:/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_results/nofilter_MA_motifs_validated.tsv") 
+write_tsv(rna_motifs_backvalidated, path ="D:/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_results/nofilter_RNASeq_motifs_validated.tsv") 
+
+```
+
+

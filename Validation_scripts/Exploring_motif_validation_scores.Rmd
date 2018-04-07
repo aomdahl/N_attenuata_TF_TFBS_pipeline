@@ -1,0 +1,151 @@
+---
+title: "Exploring_motif_validation_scores"
+author: "Ashton Omdahl"
+date: "March 6, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(magrittr)
+```
+We are looking at  the summary of our scores, trying to decide where thre threshold needs to be. I think 0.8 is probably good, will give us to TFs
+
+```{r}
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+tf_reference_match_scores <- read_tsv("./All_comparisons_summary.txt") %>% separate(Split, c("pTF_mod", "refTF"), "_against_") %>% separate(pTF_mod, c("pTF_family", "pTF_i"), "-N")  %>% mutate(pTF = paste0("N", pTF_i))
+print(tf_reference_match_scores)
+```
+Let's take a look at the distribution of the scores, how many are above our cutoff of 0.8
+
+```{r pressure, echo=FALSE}
+hist(tf_reference_match_scores$Score)
+sum(tf_reference_match_scores$Score > 0.8)
+```
+
+Let's take a look at those ones above 80- how many have unique identifiers and sequences and come from unique sources?
+```{r}
+top_match_scores <- tf_reference_match_scores %>% filter(Score >= 0.8) %>% select(-Dir_name, -Rank, -pTF_i) %>% distinct()%T>% print()
+
+write_tsv(tf_reference_match_scores %>% select(-Dir_name, -Rank, pTF_i) %>% distinct(),"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/unique_pTFs_all_3_6.tsv")
+
+
+#%>% mutate(ID = paste0(pTF,"_", refTF, "_", Comparison_seq, "_", Reference_seq, "_", Source)) %>% distinct() 
+```
+
+Wow, that's still 170! Let's see how many unique pTFs we've identified
+```{r}
+length(unique(top_match_scores$pTF))
+unique(top_match_scores$pTF)
+```
+Point of interest: what is the distribution of categories on these highly filtered pTFs?
+```{r}
+library(ggplot2)
+ggplot(top_match_scores, aes(x = Source)) + geom_histogram(stat = 'count', fill = "seagreen")
+
+```
+So this graph tells us something about the internal consistency of datasets. Basically these bars show us how many pTFs were validated  by a given method. Self-identified TFs are far more frequent.
+```{r}
+TFIntersections <- function(type1, type2)
+{
+  print(paste("TFs found by both", type1, "and", type2))
+  total_num <- unique(length(filter(top_match_scores, Source == type1)$pTF))
+  intersect_num <-sum(unique(filter(top_match_scores, Source == type1)$pTF) %in% unique(filter(top_match_scores, Source == type2)$pTF))
+  print(paste("This represents", intersect_num/total_num, "of", type1, "total pTFs"))
+  unique(filter(top_match_scores, Source == type1)$pTF[filter(top_match_scores, Source == type1)$pTF %in% filter(top_match_scores, Source == type2)$pTF])
+}
+
+TFIntersections("RNA-RNA", "MA-MA")
+TFIntersections("RNA-RNA", "MA-RNA")
+TFIntersections("RNA-RNA", "RNA-MA")
+print("")
+TFIntersections("MA-MA", "RNA-RNA")
+TFIntersections("MA-MA", "MA-RNA")
+TFIntersections("MA-MA", "RNA-MA")
+print("")
+TFIntersections("MA-RNA", "RNA-RNA")
+TFIntersections("MA-RNA", "MA-MA")
+TFIntersections("MA-RNA", "RNA-MA")
+print("")
+TFIntersections("RNA-MA", "RNA-RNA")
+TFIntersections("RNA-MA", "MA-RNA")
+TFIntersections("RNA-MA", "MA-MA")
+
+```
+
+This leads to the next question: are there any TFs that fall into all four categories? Into other subsets of them?
+```{r}
+TFOverlaps <- function(type1, type2)
+{
+unique(filter(top_match_scores, Source == type1)$pTF[filter(top_match_scores, Source == type1)$pTF %in% filter(top_match_scores, Source == type2)$pTF])
+  }
+
+TFOverlaps("RNA-RNA", "MA-MA") -> rrmm
+TFOverlaps("RNA-RNA", "MA-RNA") -> rrmr
+TFOverlaps("RNA-RNA", "RNA-MA") -> rrrm
+TFOverlaps("RNA-RNA", "RNA-RNA") -> rrrr
+rr_list <- c(rrmm, rrmr, rrrm)
+ggplot(data.frame(rr_list), aes(x=rr_list)) + geom_histogram(stat = "count", fill = "seagreen") + scale_y_continuous(breaks = seq(0,5,by=1)) + xlab(label = "TFs identified") + ggtitle("RNA-RNA TF Cross-validation Frequency")
+
+
+
+TFOverlaps("MA-MA", "RNA-RNA") -> mmrr
+TFOverlaps("MA-MA", "MA-RNA") ->mmmr
+TFOverlaps("MA-MA", "RNA-MA") -> mmrm
+TFOverlaps("MA-MA", "MA-MA") -> mmmm
+mm_list <- c(mmrr,mmmr,mmrm)
+ggplot(data.frame(mm_list), aes(x=mm_list)) + geom_histogram(stat = "count", fill = "coral") + scale_y_continuous(breaks = seq(0,5,by=1)) + xlab(label = "TFs identified") + ggtitle("MA-MA TF Cross-validation Frequency")
+
+
+
+
+TFOverlaps("MA-RNA", "RNA-RNA") -> mrrr
+TFOverlaps("MA-RNA", "MA-MA") -> mrmm
+TFOverlaps("MA-RNA", "RNA-MA") -> mrrm
+TFOverlaps("MA-RNA", "MA-RNA") -> mrmr
+mr_list <- c(mrrr,mrmm,mrrm)
+ggplot(data.frame(mr_list), aes(x=mr_list)) + geom_histogram(stat = "count", fill = "dodgerblue2") + scale_y_continuous(breaks = seq(0,5,by=1)) + xlab(label = "TFs identified") + ggtitle("MA-RNA TF Cross-validation Frequency")
+
+
+TFOverlaps("RNA-MA", "RNA-MA") -> rmrm
+TFOverlaps("RNA-MA", "RNA-RNA") -> rmrr
+TFOverlaps("RNA-MA", "MA-RNA") -> rmmr
+TFOverlaps("RNA-MA", "MA-MA")-> rmmm
+rm_list <- c(rmrr, rmmr, rmmm)
+ggplot(data.frame(rm_list), aes(x=rm_list)) + geom_histogram(stat = "count", fill = "gold") + scale_y_continuous(breaks = seq(0,5,by=1)) + xlab(label = "TFs identified") + ggtitle("RNA-MA TF Cross-validation Frequency")
+
+
+```
+Viewing the plots on top of each other:
+```{r fig.height = 7, fig.width=10}
+library(reshape)
+to_plot <- top_match_scores %>% select(pTF, Source) 
+tf_unique_list <- to_plot$pTF
+ggplot(to_plot, aes(x=pTF, fill = Source))+ geom_bar(stat = "count", position = "identity", alpha  = 0.3) + scale_y_continuous(breaks = seq(0,12, by  =2)) +  coord_flip()
+
+```
+We can show this more concisely with a venn diagram
+```{r}
+mm_all <- (top_match_scores %>% filter(Source == "MA-MA") %>% select(pTF) %>% unique())$pTF
+rr_all <- (top_match_scores %>% filter(Source == "RNA-RNA") %>% select(pTF) %>% unique())$pTF
+rm_all <- (top_match_scores %>% filter(Source == "RNA-MA") %>% select(pTF) %>% unique())$pTF
+mr_all <- (top_match_scores %>% filter(Source == "MA-RNA") %>% select(pTF) %>% unique())$pTF
+
+library(gplots)
+venn(list("MA-MA"=mm_all, "RNA-RNA"=rr_all, "MA-RNA" = mr_all, "RNA-MA" = rm_all))
+```
+This tells us that the datasets are fairly indpendent of each other, all only cover 1
+
+So now we have lists with everything in them; I am curious to know which motifs appear the most frequently across these lists. That will give us a sense for the ones most conserved (?)
+```{r}
+combined_validated_tf_list <- c(rr_list, mm_list, mr_list, rm_list)
+ggplot(data.frame(combined_validated_tf_list), aes(x=combined_validated_tf_list)) + geom_histogram(stat = "count", fill = "seagreen") + scale_y_continuous(breaks = seq(0,12,by=2)) + xlab(label = "TFs identified") + ggtitle("Top TF Cross-validation Frequency")
+
+```
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+ 

@@ -1,0 +1,353 @@
+./AP2-EREBP-NIATv7_g14482_against_NIATv7_g18001
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./AP2-EREBP-NIATv7_g14482_against_NIATv7_g32320
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./AP2-EREBP-NIATv7_g39806_against_NIATv7_g33564
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./AP2-EREBP-NIATv7_g39806_against_NIATv7_g34784
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./AP2-EREBP-NIATv7_g39806_against_NIATv7_g39997
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./ARF-NIATv7_g30370_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./ARF-NIATv7_g30370_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./ARF-NIATv7_g30370_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./ARF-NIATv7_g30370_against_NIATv7_g27795
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./ARF-NIATv7_g30370_against_NIATv7_g30742
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./ARF-NIATv7_g30370_against_NIATv7_g33088
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./BES1-NIATv7_g11639_against_NIATv7_g18001
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g14441_against_NIATv7_g17075
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g14441_against_NIATv7_g30711
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g14441_against_NIATv7_g38502
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g27795
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g29978
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g30742
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g32816
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g17432_against_NIATv7_g33088
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g21427_against_NIATv7_g16189
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g21427_against_NIATv7_g29978
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g21427_against_NIATv7_g32816
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g21427_against_NIATv7_g33088
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g38454_against_NIATv7_g17075
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g38454_against_NIATv7_g30711
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bHLH-NIATv7_g38454_against_NIATv7_g38502
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bZIP-NIATv7_g26639_against_NIATv7_g39034
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bZIP-NIATv7_g29845_against_NIATv7_g10146
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bZIP-NIATv7_g29845_against_NIATv7_g15968
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bZIP-NIATv7_g29845_against_NIATv7_g18150
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./bZIP-NIATv7_g33798_against_NIATv7_g18001
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-CO-like-NIATv7_g03485_against_NIATv7_g17075
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 1-TTCTTATCCT(0.833)
+./C2C2-CO-like-NIATv7_g03485_against_NIATv7_g30711
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 3-TCTTGTCCTA(0.660)
+./C2C2-CO-like-NIATv7_g03485_against_NIATv7_g38502
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 6-GGATAAAGAG(0.696)
+./C2C2-CO-like-NIATv7_g19646_against_NIATv7_g17075
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 1-TTCTTATCCT(0.720)
+./C2C2-CO-like-NIATv7_g19646_against_NIATv7_g30711
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 1-MGTTACCTTT(0.535)
+./C2C2-CO-like-NIATv7_g19646_against_NIATv7_g38502
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 6-GGATAAAGAG(0.745)
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g16189
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g29978
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g30742
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g32816
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./C2C2-GATA-NIATv7_g19992_against_NIATv7_g33088
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./CPP-NIATv7_g06415_against_NIATv7_g24648
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./GNAT-NIATv7_g23237_against_NIATv7_g17075
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./GNAT-NIATv7_g23237_against_NIATv7_g30711
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./GNAT-NIATv7_g23237_against_NIATv7_g38502
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./GRF-NIATv7_g15479_against_NIATv7_g18001
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./IWS1-NIATv7_g13959_against_NIATv7_g07696
+	Determining similar motifs... 2 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 1-GCGTTGAC(0.852)
+./IWS1-NIATv7_g13959_against_NIATv7_g21131
+	Determining similar motifs... 2 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 5-TGAACAAACG(0.539)
+./IWS1-NIATv7_g13959_against_NIATv7_g21524
+	Determining similar motifs... 2 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 1-AAASACAAAG(0.494)
+./IWS1-NIATv7_g13959_against_NIATv7_g30742
+	Determining similar motifs... 2 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 4-AGTGACTTTT(0.469)
+./mTERF-NIATv7_g21744_against_NIATv7_g17075
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./mTERF-NIATv7_g21744_against_NIATv7_g30711
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./mTERF-NIATv7_g21744_against_NIATv7_g38502
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./MYB-NIATv7_g13170_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./MYB-NIATv7_g13170_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./MYB-NIATv7_g13170_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./MYB-NIATv7_g17075_against_NIATv7_g17075
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./MYB-NIATv7_g17075_against_NIATv7_g30711
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./MYB-NIATv7_g17075_against_NIATv7_g38502
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./RWP-RK-NIATv7_g21282_against_NIATv7_g18001
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./Sigma70-like-NIATv7_g12353_against_NIATv7_g17075
+	Determining similar motifs... 4 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 1-TTCTTATCCT(0.662)
+./Sigma70-like-NIATv7_g12353_against_NIATv7_g30711
+	Determining similar motifs... 4 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 3-TCTTGTCCTA(0.608)
+./Sigma70-like-NIATv7_g12353_against_NIATv7_g38502
+	Determining similar motifs... 4 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 6-GGATAAAGAG(0.667)
+./Sigma70-like-NIATv7_g24502_against_NIATv7_g17075
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./Sigma70-like-NIATv7_g24502_against_NIATv7_g30711
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./Sigma70-like-NIATv7_g24502_against_NIATv7_g38502
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./Sigma70-like-NIATv7_g25635_against_NIATv7_g17075
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 1-TTCTTATCCT(0.760)
+./Sigma70-like-NIATv7_g25635_against_NIATv7_g30711
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 3-TCTTGTCCTA(0.642)
+./Sigma70-like-NIATv7_g25635_against_NIATv7_g38502
+	Determining similar motifs... 1 reduced to 1 motifs
+	Outputing HTML and sequence logos for motif comparison...
+	Checking de novo motifs against known motifs...
+	Formatting HTML page...
+		1 of 1 (2.718e+00) similar to 6-GGATAAAGAG(0.641)
+./SNF2-NIATv7_g15714_against_NIATv7_g24648
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./SNF2-NIATv7_g15714_against_NIATv7_g33410
+sed: can't read ./*_ref.motif: No such file or directory
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./TRAF-NIATv7_g21454_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./TRAF-NIATv7_g21454_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./TRAF-NIATv7_g21454_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./TRAF-NIATv7_g21454_against_NIATv7_g30742
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g07696_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g07696_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g07696_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g07696_against_NIATv7_g27795
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g07696_against_NIATv7_g30742
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g19088_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g19088_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g19088_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g19088_against_NIATv7_g30742
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g26487_against_NIATv7_g07696
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g26487_against_NIATv7_g21131
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g26487_against_NIATv7_g21524
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!
+./WRKY-NIATv7_g26487_against_NIATv7_g30742
+Use of uninitialized value in numeric gt (>) at /home/aomdahl/bin/homer/.//bin/compareMotifs.pl line 1381.
+	!!! Filtered out all motifs!!!

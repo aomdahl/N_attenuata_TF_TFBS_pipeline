@@ -11,8 +11,12 @@ import argparse
 #Pass_in is a line from the extracted file
 #returns the identfier, as well as the binding motif and the associated TF
 def extractDirIDKey(pass_in):
-    core_gene = pass_in[11]
-    cg_fam = pass_in[12]
+    try:
+        core_gene = pass_in[11]
+        cg_fam = pass_in[12]
+    except IndexError:
+        print (pass_in)
+        return None, None
     return cg_fam + "-" + core_gene, pass_in[4]
 
 def ExtractTFKey(pass_in):
@@ -86,6 +90,8 @@ if __name__ == '__main__':
                 line = line.strip()
                 if "PutativeTF" not in line:
                     search_key, p_motif = extractDirIDKey(line.split('\t'))
+                    if search_key == None or p_motif == None:
+                        continue
                     p_tf = ExtractTFKey(line.split('\t'))
                     dir_name_out = search_key + "_against_" + p_tf
                     #If we are just going to extract the same data again...
