@@ -1,0 +1,69 @@
+---
+title: "Comparing the metadata
+output: html_document
+---
+Ashton Omdahl  
+
+##Load the relevant libraries  
+```{r "setup", include = FALSE}
+library(knitr)
+opts_knit$set(root.dir = "D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+library("readr")
+library("tidyr")
+library("dplyr")
+library("ggplot2")
+library("magrittr")
+
+```
+
+Import the data, keep just what we are interested in
+```{r}
+TF.MA <- read_tsv("ma.12.29.TF.superTable.remade.tsv") %>% print()
+TF.RNASEQ <- read_tsv("RNA.8.17.TF.superTable.tsv") %>% print()
+```
+#RNA-Seq Top Consered Motifs
+```{r}
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+RNA.motifData <-read_tsv("RNA.8.17.motifs.superTable.tsv")
+RNA.motif.topCandidates <- RNA.motifData %>% filter(ConservationScore > 0.5) %>% filter(`ConservationP-value` <= 0.001)
+```
+###Core module genes that appear in both datasets
+Curiosity: are there any of the module core genes that overlap? 
+That is to say, do any of the dataests identify the same core genes
+that also are associated wiith statistically significant motifs we identified?
+
+For now, let's see what TFs are associated with these, both individually as separate datasets and together
+```{r}
+#Doing it for RNA-seq first, cuz the microarray ones didn't come out right.
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+RNA.TF_Data <-read_tsv("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/RNA.8.17.TF.superTable.tsv")
+#Keep all the TFs associated with statistically conserved motifs.
+#We want the core module gene and the motifs to match
+RNA.motif.topCandidates.CoreGene_Motif <- RNA.motif.topCandidates %>% select(Motif, ModuleCoreGene) %>% mutate("Key" = paste0(Motif, "_", ModuleCoreGene))
+RNA.TF.fromConservedMotifs <- RNA.TF_Data %>% mutate("id" = paste0(`Put.BindingMotif`, "_", ModuleCoreGene)) %>% filter(id %in% RNA.motif.topCandidates.CoreGene_Motif$Key)
+
+RNA.TF.fromConservedMotifs.TopCandidates <- RNA.TF.fromConservedMotifs %>% filter(MotifLibraryMatchScore >= 0.75) %>% mutate("NonsignCorrelation" = abs(ModuleCorrelation)) %>% filter(NonsignCorrelation >= 0.75) %>% filter(ModuleExpressionScore >= 0.75, BLASTPercentIdentity >= 50) %>% select(-id, NonsignCorrelation) %>% mutate("id" = paste0(PutativeTF, "_", ModuleCoreGene, "_", `Put.BindingMotif`)) 
+
+write_tsv(RNA.TF.fromConservedMotifs.TopCandidates, "D:/AshtonData/MPI_all_data/SummaryFiles_8-17/RNA-TF-0.5_cons_threshold.tsv")
+```
+
+##REpeating thsi analysis for the MA data
+```{r}
+
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+#Keep all the TFs associated with statistically conserved motifs.
+#We want the core module gene and the motifs to match
+MA.motif.topCandidates.CoreGene_Motif <- MA.motif.topCandidates %>% select(Motif, ModuleCoreGene) %>% mutate("Key" = paste0(Motif, "_", ModuleCoreGene))
+MA.TF.fromConservedMotifs <-TF.MA %>% mutate("id" = paste0(`Put.BindingMotif`, "_", ModuleCoreGene)) %>% filter(id %in% MA.motif.topCandidates.CoreGene_Motif$Key)
+```
+______
+This gives us 301 unique TFs to work with from the MA data. Now for filtering. 
+```{r}
+MA.TF.fromConservedMotifs <- MA.TF.fromConservedMotifs %>% rename(MotifLibraryMatchScore= MotifMathScore, ModuleExpressionScore = WGCNAModuleConnectivity)
+
+MA.TF.fromConservedMotifs.TopCandidates <- MA.TF.fromConservedMotifs %>% filter(MotifLibraryMatchScore >= 0.75) %>% mutate("NonsignCorrelation" = abs(ModuleCorrelation)) %>% filter(NonsignCorrelation >= 0.75) %>% filter(ModuleExpressionScore >= 0.75, BLASTPercentIdentity >= 50) %>% select(-id, NonsignCorrelation) %>% mutate("id" = paste0(PutativeTF, "_", ModuleCoreGene, "_", `Put.BindingMotif`)) 
+
+write_tsv(MA.TF.fromConservedMotifs.TopCandidates, "D:/AshtonData/MPI_all_data/SummaryFiles_8-17/TopMATFCandidates_1_6_18.tsv")
+```
+
+
