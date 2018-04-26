@@ -2,6 +2,7 @@
 ###########################################
 #This is a simple tool to perform useful functions having to do with the HOMER motif recognition tool.
 ##########################################
+from Bio import SeqIO
 import re
 import os
 import argparse
@@ -36,30 +37,13 @@ class HomerData:
 
 ###################Parse HTML from HOMER output################
 
-#A super function that can perform the extraction on a series of directories and return printed output
-def assembleMotifMatchResults(dir_path):
-	first_run = True
-	#iterate through each directory
-	for i in os.listdir(dir_path):
-		if os.path.isdir(dir_path + "/" + i): #If folder is a directory
-			#look for the homerResults directory
-			if os.path.isdir(dir_path + "/" + i + "/homerResults"):
-				#iterate through each relevant html file inside.
-				writeMotifMatchHTML(dir_path + "/" + i + "/homerResults", first_run, dirs_name =i)
-				first_run = False
-	return
-
-
 #Helper function to write it out to a page.
-def writeMotifMatchHTML(path, header = False, dirs_name = ""):
-	if header:
-		print("Dir_name\tComparison_seq\tReference_seq\tRank\tScore")
+def writeMotifMatchHTML(path):
 	refMotifMap = dict()
 	#writeOut= open(outputFile, 'w')
-	#print(os.listdir(path))
 	for i in os.listdir(path):
 		if i.endswith(".info.html"): 
-			motifMatchHTMLExtraction(path + "/" + i, printOut = True, dir_name = dirs_name)
+			motifMatchHTMLExtraction(path + "/" + i, printOut = True)
 	#print "Output written to", outputFile
 	#writeOut.close()
 
@@ -68,7 +52,7 @@ def writeMotifMatchHTML(path, header = False, dirs_name = ""):
 #htmlFile- path to the file in
 #@param outFile- the path to an output writing file if you want to do that.
 #@return a list [seqeunce, list of each TFBS that matches that sequence]
-def motifMatchHTMLExtraction(htmlFile, printOut = False, dir_name = ""):
+def motifMatchHTMLExtraction(htmlFile, printOut = False):
 	#The keys that we want
 	refMotifDataList = list()
 	htmlFileStream = open(htmlFile, 'r')
@@ -85,16 +69,14 @@ def motifMatchHTMLExtraction(htmlFile, printOut = False, dir_name = ""):
 	
 	#Option to write these out.
 	if printOut:
-		print_str = ""
 		#print refMotifDataList
 		for subList in refMotifDataList:
-			print_str = dir_name + '\t'
 			if subList is not None:
-				print_str = print_str + seq
+				print seq, '\t',
 				for element in subList:
 					if type(element) is str:
-						print_str = print_str + "\t"+ element
-				print(print_str)
+						print element, '\t',
+				print ''
 		return
 		
 	return [seq, filter(None, refMotifDataList)]  #filter out the leftover nonetype matches.
@@ -134,7 +116,7 @@ def findMotifDataCoreHTML(fileStream):
 			motifData.append(extractHTMLValue(currentLine, SCORE))
 		elif OFFSET in currentLine:  #After we get all the data we want
 			if len(motifData) != 3:
-				print ("ERROR- didn't get everything")
+				print "ERROR- didn't get everything"
 			return motifData
 		else:
 			pass
@@ -205,7 +187,7 @@ def convertPPToHomerLibrary(inFilePath, outFilePath, customThresh = 8):
 		currentLine = PWSDB.readline().strip()
 		lineCount +=1
 	writeHomerDB(outFilePath, motifList)
-	print ("Converted PlantPan database to HOMER format!  Check results.")
+	print "Converted PlantPan database to HOMER format!  Check results."
 
 #Converts CIS-BP format PWMs into a HOMER-compatible .motifs file
 #@param inPath- the path to a directory containing all of the PWMs you wish to include in the HOMER file
@@ -237,7 +219,7 @@ def convertCISPBtoHomerLibrary(inPath, outFilePath, customThresh=8):
 		motifList.append(currHomer)
 		counter += 1
 	writeHomerDB(outFilePath, motifList)
-	print ("Converted CISBP database to HOMER format!  Check results.")
+	print "Converted CISBP database to HOMER format!  Check results."
 		
 				
 				
@@ -250,7 +232,7 @@ def safeLineExtraction(fileStream, lineCount = 4):
 	for i in range(0, lineCount):
 		currLine = fileStream.readline().strip()
 		if currLine == "":
-			print ("Empty line found")
+			print "Empty line found"
 		else:
 			lineList.append(currLine)
 	if len(lineList) == lineCount:
@@ -260,7 +242,7 @@ def safeLineExtraction(fileStream, lineCount = 4):
 #Takes a matrix- list of lists- and transforms it into HOMER accepted format
 def transformMatrix(matrix):
 	if matrix is None:
-		print ("Matrix is of noneType")
+		print "Matrix is of noneType"
 		return list()
 		
 	retMatrix = list()
@@ -281,7 +263,7 @@ def extractMatrixLineValues(line, searchRegex, delim = '\t'):
 	if dataExtract:
 		return dataExtract.group(1).strip().split(delim)
 	else:
-		print ("No data located", line)
+		print "No data located", line
 		return list()
 	
 
@@ -291,9 +273,8 @@ def extractMatrixLineValues(line, searchRegex, delim = '\t'):
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='HOMER tool with multiple functions.  htmlParser parses HOMER html output from compareMotifs.pl.  libConversion takes a database and converts it to .motifs file')
 	parser.add_argument("-hs", "--htmlSource", help="Specify the path to the homer output of html files.")
-	parser.add_argument("--dirs", help = "Specify a directory of directories to be printed out")
 	parser.add_argument("-o", "--output", default = "TF_match.tsv", help="Specify the comparison output file, default is \"TF_match.tsv\"")
-	parser.add_argument("--htmlParser", action = "store_true", help = "Specify this if you want to use the html parsing tool and print an output for one dir only")
+	parser.add_argument("--htmlParser", action = "store_true", help = "Specify this if you want to use the html parsing tool and print an output")
 	parser.add_argument("-l", "--libConversion",choices=["PP", "CISBP"], help = "Specify the type of library you wish to convert")
 	parser.add_argument("-lp", "--libPath", help = "Specify the path to the PP or CISBP library you wish to convert")
 	parser.add_argument("-log", "--logOddsDetection", type=int, default = 8, help = "Specify a log odds detection threshold to useif you are doing a library conversion. Should be between 5.0 and 10.0")
@@ -309,9 +290,6 @@ if __name__ == '__main__':
 			convertCISPBtoHomerLibrary("/home/likewise-open/ICE/aomdahl/Datasets/CIS-BP/PWMs/pwms", args.output, args.logOddsDetection)
 		else:
 			convertCISPBtoHomerLibrary(args.libPath, args.output, args.logOddsDetection)
-
-	if(args.dirs):
-		assembleMotifMatchResults(args.dirs)
 
 	if(args.htmlParser):
 		writeMotifMatchHTML(args.htmlSource)
