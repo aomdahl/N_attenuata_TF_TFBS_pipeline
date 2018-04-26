@@ -18,7 +18,7 @@ We are looking at  the summary of our scores, trying to decide where thre thresh
 ```{r}
 #This got deleted- need to fix it to do what we want it to -_- it (!!) that's what you get for not updating to Git consistently.
 setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/nofilter_results")
-tf_reference_match_scores <- read_tsv("./nofilter_complete_results.tsv") %>% select(-Rank) %>% separate(Dir_name, c("pTF_mod", "pTF"), "_against_") %>% separate(pTF_mod, c("pTF_family", "pTF_i"), "-N")  %>% mutate("ModuleCoreGene" = paste0("N", pTF_i)) %>% separate(Source, c("SourceData", "RefData"), "-") %>% rename("Motif" = Comparison_seq) %>% select(-pTF_i)
+tf_reference_match_scores <- read_tsv("./nofilter_complete_results.tsv")%>% select(-Rank) %>% separate(Dir_name, c("pTF_mod", "pTF"), "_against_") %>% separate(pTF_mod, c("pTF_family", "pTF_i"), "-N")  %>% mutate("ModuleCoreGene" = paste0("N", pTF_i)) %>% separate(Source, c("SourceData", "RefData"), "-") %>% rename("Motif" = Comparison_seq) %>% select(-pTF_i)
 print(tf_reference_match_scores)
 ```
 We want to line these up with the conservation score for the motifs, and see if there is some kind of correlation between Match score and conservation score (assuming significance on those)
