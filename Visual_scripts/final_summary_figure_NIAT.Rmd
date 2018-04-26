@@ -1,0 +1,105 @@
+---
+title: "final_summary_figure_Niat"
+author: "Ashton Omdahl"
+date: "April 20, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source("https://bioconductor.org/biocLite.R")
+biocLite("motifStack")
+Sys.setenv(R_GSCMD=file.path("C:", "Program Files", "gs", 
+                             "gs9.23", "bin", "gswin64c.exe"))
+```
+Trying this out for the first time....
+```{r}
+library(motifStack)
+pcm <- read.table(file.path(find.package("motifStack"), 
+                            "extdata", "bin_SOLEXA.pcm"))
+pcm <- pcm[,3:ncol(pcm)]
+pcm
+rownames(pcm) <- c("a", "c", "g", "t")
+# simple table, where rows are letters
+motif <- new("pcm", mat=as.matrix(pcm), name="bin_SOLEXA")
+opar<-par(mfrow=c(4,1))
+plot(motif)
+
+```
+Now, let's try it on my data.
+```{r}
+library(motifStack)
+
+pcm_attempt <- read.table("E:/AshtonData/MPI_all_data/Final_results_hopefully/NIATv7_g03410/pwm_for_analysis.motif")
+t(pcm_attempt) -> pcm_attempt
+rownames(pcm_attempt) <- c("A", "C", "G", "T")
+motif_attempt <- new("pcm", mat = as.matrix(pcm_attempt), name = "WRKY9")
+plot(motif_attempt)
+```
+
+So we know that works. Now let's try doing something with multiple logos.
+```{r}
+many <- importMatrix(dir(file.path(find.package("motifStack"), "extdata"), "pcm$", full.names = T))
+
+```
+Now my turn
+
+```{r}
+path <- dir('E:/AshtonData/MPI_all_data/Final_results_hopefully/NIATv7_g33798/', "*.motif,", full.names = T)
+importMatrix('E:/AshtonData/MPI_all_data/Final_results_hopefully/all_motifs_for_image.txt', format = "pcm") -> thing
+
+jpeg('E:/AshtonData/MPI_all_data/Final_results_hopefully/test.jpg')
+motifStack(top_27, layout = "radialPhylog")
+dev.off()
+```
+K. Now that we know it works, its time to see what we can do...
+```{r}
+importMatrix('E:/AshtonData/MPI_all_data/Final_results_hopefully/all_motifs_for_image.txt', format = "pcm") -> top_27
+
+#Cluster the motifs (easy)
+jaspar.scores <- MotIV::readDBScores(file.path(find.package("MotIV"), 
+                                               "extdata", 
+                                               "jaspar2010_PCC_SWU.scores"))
+d <- MotIV::motifDistances(lapply(top_27, pfm2pwm))
+hc <- MotIV::motifHclust(d, method = "average")
+phylog <- hclust2phylog(hc)
+#reorder things by the hclus procedure
+names(top_27) <- gsub("\\.", "_", names(top_27))
+tf_names <- names(phylog$leaves)
+top_27 <- top_27[tf_names]
+
+```
+Okay. That's all set- now we tinker.
+
+```{r}
+library(RColorBrewer)
+color <- brewer.pal(12, "Set3")
+motifPiles(phylog= phylog, pfms = top_27, r.anno = c(0.02, 0.03, 0.04),  col.anno = list(sample(colors(),50), sample(colors(), 50), sample(colors(), 50)))
+```
+
+```{r}
+setwd("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/")
+#We want to get a heatmap in there....
+library(readr)
+library(magrittr)
+library(dplyr)
+scores <- read_tsv("./in_order_motifs.txt") %>% select(-ID, -MotifconservationScore)
+
+map2col <- function(x, pal){
+  rg <- range(x)
+  pal[findInterval(x, seq(rg[1], rg[2], length.out = length(pal)+1), 
+                   all.inside = TRUE)]
+}
+dl <- lapply(scores, map2col, pal=rainbow(150, start = 4/6, end = 0 ))
+dl <- lapply(scores, map2col, pal=colorRampPalette(c("red", "black", "green"))(n = 100))
+
+tiff("TF-Motif-plot.tiff", width = 10, height = 10, res = 300)
+motifPiles(phylog= phylog, pfms = top_27, r.anno = rep(0.06, length(dl)), r.tree = 0.15, col.anno = dl, plotIndex = T, motifScale = "linear", col.pfms.width = 0.004, r.pfms = 0.5)
+dev.off()
+#To add- color based on module
+#shrink the size of teh branches
+# + legend(x = 5,fill = dl,legend = c("test", "test"))
+```
+
+
+

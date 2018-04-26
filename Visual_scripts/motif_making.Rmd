@@ -1,0 +1,64 @@
+---
+title: "top_binding_site_visuals"
+author: "Ashton Omdahl"
+date: "April 13, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+library(readr)
+library(tidyr)
+```
+Function to make seq_logos
+```{r}
+motifToSeqLogo <- function(path){
+  library(ggseqlogo)
+  nucl <- c("A", "C", "G", "T")
+f <- t(as.matrix(read_tsv(path, col_names = F)))
+rownames(f) <- nucl
+ggplot() + geom_logo(f) + theme_logo() + xlab("Sequence position")
+}
+```
+
+The first one: the binding site for NIATv7_29978, WRKY TF, that we predict regulates synthesis of spermidine synthase 1
+```{r}
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/NIATv7_29978-binding-TAGTCAAC.txt")+ annotate('rect', xmin = 2.5, xmax = 7.5, ymin = -0.1, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue')+ annotate('text', x=4.3, y = 2.1, label = "G-box motif", size = 8)
+
+ggsave("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/NIATv7_29978-binding-TAGTCAAC-box.png", width = 7, height = 5)
+
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/NIATv7_29978-binding-TAGTCAAC.txt")
+
+ggsave("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/NIATv7_29978-binding-TAGTCAAC-no_box.png", width = 7, height = 5)
+```
+Now I also want to show the motif that it matched with in the search
+```{r}
+
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/arabidopsis_NIATv7_29978_match.txt")+ annotate('rect', xmin = 1.5, xmax = 6.5, ymin = -0.1, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue')+ annotate('text', x=4.0, y = 2.1, label = "G-box motif", size = 8)
+
+ggsave("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/arabidopsis_NIATv7_29978_match-box.png", width = 7, height = 5)
+
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/arabidopsis_NIATv7_29978_match.txt")
+
+ggsave("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/arabidopsis_NIATv7_29978_match-no_box.png", width = 7, height = 5)
+```
+
+```{r}
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/JAZd_MA_binding_MYC2.txt")+ annotate('rect', xmin = 2.5, xmax = 8.5, ymin = -0.1, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue')+ annotate('text', x=4.0, y = 2.1, label = "G-box", size = 8)
+
+ggsave("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/JAZd_MA_binding_MYC2_label.png", width = 7, height = 5)
+
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/JAZd_MA_binding_MYC2.txt")
+
+ggsave("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/JAZd_MA_binding_MYC2_nolabel.png", width = 7, height = 5)
+
+```
+
+```{r}
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/G-BOX_MOTIF_FOR_ANALYSIS_jaZB_RNASEQ.txt")+ annotate('rect', xmin = 2.5, xmax = 8.5, ymin = -0.1, ymax = 1.1, alpha = 0.1, col = 'black', fill = 'blue')+ annotate('text', x=3.0, y = 1.2, label = "G-box", size = 8)
+
+ggsave("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/G-BOX_MOTIF_FOR_ANALYSIS_jaZB_RNASEQ.png", width = 7, height = 5)
+
+```

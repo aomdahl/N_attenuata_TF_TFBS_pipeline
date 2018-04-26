@@ -1,0 +1,164 @@
+---
+title: "WRKY Visuals"
+author: "Ashton"
+date: "August 16, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+library(readr)
+library(tidyr)
+```
+
+## Analysis- does this dataset pass the threshold tests?
+
+The WRKY example
+```{r}
+getDups <- function(tabIn)
+{
+  dups1 <- (tabIn[duplicated(tabIn$GeneID),])$GeneID
+duplicates <- tabIn %>% filter(GeneID %in% dups1) %>% group_by(GeneID) %>% mutate(diffs = c(NA,diff(Start))) %>% filter(diffs < 6) %>% filter(diffs > -6)
+duplicates
+}
+
+#DO not- must be treated separately Combine the bed hits
+
+
+#Select binding sites that have high conservation scores and statistically significant scores and have real TFs assigned
+pTFs <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/WRKY-NIAT_g07696/CombinedFinalResults/pTF_library.tsv", col_names = T)
+pMotifs <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/WRKY-NIAT_g07696/CombinedFinalResults/MotifHits.tsv", col_names = T) %>% filter(ConservationScore >= 0.5, `ConservationP-value` <=0.002)
+
+#Select the motifs that actually have TF assignments
+candidate_motifs <- pMotifs$Motif[pMotifs$Motif %in% pTFs$Put.BindingMotif]
+
+bedHits.2kb <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/WRKY-NIAT_g07696/2KB/topMotifSites.bed", col_names = F) %>% mutate(kb = "2kb") %>% rename(GeneID = X1, Start = X2, Stop = X3, Name = X4, Score = X5, Strand = X6) %>% separate(Name, into = c("Num", 'Seq'), sep = "-") %>% select(-Num) %>% filter(Seq %in% candidate_motifs)
+
+bedHits.1kb <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/WRKY-NIAT_g07696/1KB/topMotifSites.bed", col_names = F) %>% mutate(kb = "1kb") %>% rename(GeneID = X1, Start = X2, Stop = X3, Name = X4, Score = X5, Strand = X6)%>% separate(Name, into = c("Num", 'Seq'), sep = "-") %>% select(-Num)  %>% filter(Seq %in% candidate_motifs)
+#Recall that we don't want to double count motifs
+
+allbedHits <- bind_rows(bedHits.1kb, bedHits.2kb) %>% mutate(From2000 = ifelse(kb == "1kb", Start + 1000, Start)) %>% arrange(GeneID) %>% distinct(GeneID, From2000, .keep_all = T) %>% mutate(Dist = 2000-From2000)
+
+
+ggplot(data = allbedHits, aes(Dist, y = ..density..)) +geom_histogram(aes(Dist),fill = 'lightblue', breaks = seq(0,2000, by = 100)) + xlab("Upstream distance from start site (bp)") + theme_minimal() + scale_x_continuous(breaks =seq(0, 2000, by = 200)) + geom_density(aes(Dist))  + geom_density()
+
+ggplot(data = allbedHits, aes(Dist)) +geom_histogram(aes(Dist),fill = 'lightblue', breaks = seq(0,2000, by = 100)) + xlab("Upstream distance from start site (bp)") + theme_minimal() + scale_x_continuous(breaks =seq(0, 2000, by = 200)) + geom_density(aes(Dist))
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/WRKY-NIAT_g07696/pMotifs.png", width = 9, height = 6)
+#ggplot(allbedHits, aes(Dist)) +geom_density(col = 2) 
+
+###Last steps 
+#Now I want to make a visual showing the sequences
+library(ggseqlogo)
+nucl <- c("A", "C", "G", "T")
+f <- t(as.matrix(read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/WRKY-NIAT_g07696/CTGTTGAC-motifFile.txt", col_names = F)))
+rownames(f) <- nucl
+s <- t(as.matrix(read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/WRKY-NIAT_g07696/GCGTTGAC-motifFile.txt", col_names = F)))
+rownames(s) <- nucl
+fplot = ggplot() + annotate('rect', xmin =3.5, xmax = 8.5, ymin = -0.05, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue') + geom_logo(f) + theme_logo() + xlab("Sequence position") + annotate('text', x=4.3, y = 2.1, label = "W-box", size = 8)
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/WRKY-NIAT_g07696/CTGTTGAC-motifFile.png", fplot,width = 7, height = 5)
+
+splot =  ggplot() + annotate('rect', xmin =3.5, xmax = 8.5, ymin = -0.05, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue') + geom_logo(s) + theme_logo() + xlab("Sequence position") + annotate('text', x=4.3, y = 2.1, label = "W-box", size = 8)
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/WRKY-NIAT_g07696/GCGTTGAC-motifFile.png", splot, width = 7, height = 5)
+
+
+plot_grid(fplot, splot, ncol = 1, align = 'v')
+```
+The seqlogo function
+```{r}
+motifToSeqLogo <- function(path){
+  library(ggseqlogo)
+  nucl <- c("A", "C", "G", "T")
+f <- t(as.matrix(read_tsv(path, col_names = F)))
+rownames(f) <- nucl
+ggplot() + geom_logo(f) + theme_logo() + xlab("Sequence position")
+}
+
+
+
+
+```
+The tify example
+```{r}
+
+#Combine the bed hits
+#Select binding sites that have high conservation scores and statistically significant scores and have real TFs assigned
+pTFs.tify <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/Tify-NIATv7_g23423/CombinedFinalResults/pTF_library.tsv", col_names = T)
+pMotifs.tify <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/Tify-NIATv7_g23423/CombinedFinalResults/MotifHits.tsv", col_names = T) %>% filter(ConservationScore >= 0.5, `ConservationP-value` <=0.002)
+#Select the motifs that actually have TF assignments
+candidate_motifs.tify <- pMotifs.tify$Motif[pMotifs.tify$Motif %in% pTFs.tify$Put.BindingMotif]
+bedHits.2kb.tify <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/Tify-NIATv7_g23423/2KB/topMotifSites.bed", col_names = F) %>% mutate(kb = "2kb") %>% rename(GeneID = X1, Start = X2, Stop = X3, Name = X4, Score = X5, Strand = X6) %>% separate(Name, into = c("Num", 'Seq'), sep = "-")%>% select(-Num) %>% filter(Seq %in% candidate_motifs.tify)
+bedHits.1kb.tify <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/Tify-NIATv7_g23423/1KB/topMotifSites.bed", col_names = F) %>% mutate(kb = "1kb") %>% rename(GeneID = X1, Start = X2, Stop = X3, Name = X4, Score = X5, Strand = X6)%>% separate(Name, into = c("Num", 'Seq'), sep = "-") %>% select(-Num)  %>% filter(Seq %in% candidate_motifs.tify)
+#Recall that we don't want to double count motifs
+allbedHits.tify <- bind_rows(bedHits.1kb.tify, bedHits.2kb.tify) %>% mutate(From2000 = ifelse(kb == "1kb", Start + 1000, Start)) %>% arrange(GeneID) %>% distinct(GeneID, From2000, .keep_all = T) %>% mutate(Dist = 2000-From2000) 
+
+
+
+##Need to filter this more by ones that overlap and are right on top of each other -- there are quite a few
+tify.dups <- getDups(allbedHits.tify)
+allbedHits.tify %>% filter( !(GeneID %in% tify.dups$GeneID)|!(Start %in% tify.dups$Start) |!(Score %in% tify.dups$Score) | !(Stop %in% tify.dups$Stop) | !(Seq %in% tify.dups$Seq))-> allbedHits.tify.filtered
+
+ggplot(allbedHits.tify, aes(Dist)) +geom_histogram(aes(Dist),fill = 'lightblue', breaks = seq(0,2000, by = 100)) + xlab("Upstream distance from start site (bp)") + theme_minimal() + scale_x_continuous(breaks =seq(0, 2000, by = 200))
+
+###Last steps -- more filtering
+#get teh seq logo
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/Tify-NIATv7_g23423/CACGTGTC-motif.txt") + annotate('rect', xmin = 0.5, xmax = 6.5, ymin = -0.1, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue') + annotate('text', x=1.3, y = 2.1, label = "G-box", size = 8)
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/Tify-NIATv7_g23423/CACGTGTC-motif.png", width = 7, height = 5)
+
+
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/Tify-NIATv7_g23423/GGCCACGTGT-motif.txt") + annotate('rect', xmin = 3.5, xmax = 9.5, ymin = -0.1, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue') + annotate('text', x=4.3, y = 2.1, label = "G-box", size = 8)
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/Tify-NIATv7_g23423/GGCCACGTGT-motif.png", width = 7, height = 5)
+
+
+motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Summer 2016/DatabaseFiles/MA/Tify-NIATv7_g23423/TGCCACGTGT-motif.txt") + annotate('rect', xmin = 3.5, xmax = 9.5, ymin = -0.1, ymax = 2, alpha = 0.1, col = 'black', fill = 'blue') + annotate('text', x=4.3, y = 2.1, label = "G-box", size = 8)
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/Tify-NIATv7_g23423/TGCCACGTGT-motif.png", width = 7, height = 5)
+
+
+
+```
+
+```{r}
+graphBindSites <- function(folderPath)
+  {
+pTFs <- read_tsv(paste(folderPath, '/CombinedFinalResults/pTF_library.tsv', sep=""), col_names = T)
+pMotifs <- read_tsv(paste(folderPath, "/CombinedFinalResults/MotifHits.tsv", sep=""), col_names = T) %>% filter(ConservationScore >= 0.4, `ConservationP-value` <=0.002)
+                         
+#Select the motifs that actually have TF assignments
+candidate_motifs <- pMotifs$Motif[pMotifs$Motif %in% pTFs$Put.BindingMotif]
+bedHits.2kb <- read_tsv(paste(folderPath, "/2kb/topMotifSites.bed", sep=""), col_names = F) %>% mutate(kb = "2kb") %>% rename(GeneID = X1, Start = X2, Stop = X3, Name = X4, Score = X5, Strand = X6) %>% separate(Name, into = c("Num", 'Seq'), sep = "-")%>% select(-Num) %>% filter(Seq %in% candidate_motifs) %>%  arrange(GeneID) %>% distinct(GeneID, Start, .keep_all = T) %>% mutate(Dist = 2000-Start)
+print(bedHits.2kb)
+
+bedHits.1kb <- read_tsv(paste(folderPath, '/1kb/topMotifSites.bed', sep=""), col_names = F) %>% mutate(kb = "1kb") %>% rename(GeneID = X1, Start = X2, Stop = X3, Name = X4, Score = X5, Strand = X6)%>% separate(Name, into = c("Num", 'Seq'), sep = "-") %>% select(-Num)  %>% filter(Seq %in% candidate_motifs) %>% arrange(GeneID) %>% distinct(GeneID, Start, .keep_all = T) %>% mutate(Dist = 1000-Start)
+
+#This isn't necessary here
+#allbedHits <- bind_rows(bedHits.1kb, bedHits.2kb) %>% mutate(From2000 = ifelse(kb == "1kb", Start + 1000, Start)) %>% arrange(GeneID) %>% #distinct(GeneID, From2000, .keep_all = T) %>% mutate(Dist = 2000-From2000)
+
+#print(allbedHits)
+#dups <- getDups(allbedHits)
+#allbedHits.filtered <- allbedHits  %>% filter( !(GeneID %in% dups$GeneID)|!(Start %in% dups$Start) |!(Score %in% dups$Score) | !(Stop %in% dups$Stop) | !(Seq %in% dups$Seq))
+ggplot(bedHits.1kb, aes(Dist)) +geom_histogram(aes(Dist),fill = 'lightblue', breaks = seq(0,1000, by = 50)) + xlab("Upstream distance from start site (bp)") + theme_minimal() + scale_x_continuous(breaks =seq(0, 1000, by = 100))
+
+ggsave(paste(folderPath, "/1kb_histo.png", sep=""), width = 8, height = 5)
+
+ggplot(bedHits.2kb, aes(Dist)) +geom_histogram(aes(Dist),fill = 'lightblue', breaks = seq(0,2000, by = 50)) + xlab("Upstream distance from start site (bp)") + theme_minimal() + scale_x_continuous(breaks =seq(0, 2000, by = 200))
+
+ggsave(paste(folderPath, "/2kb_histo.png", sep=""), width = 8, height = 5)
+bedHits.1kb
+
+}
+graphBindSites('C:/Users/aomda/OneDrive/Documents/Summer\ 2016/DatabaseFiles/MA/WRKY-NIAT_g07696') -> sto2
+
+
+graphBindSites('C:/Users/aomda/OneDrive/Documents/Summer\ 2016/DatabaseFiles/MA/Tify-NIATv7_g23423') ->sto3
+graphBindSites('C:/Users/aomda/OneDrive/Documents/Summer\ 2016/DatabaseFiles/MA/bHLH-NIATv7_16429')
+
+sto<- motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/bHLH-NIATv7_16429/TTGACCAT-motif.txt") 
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/bHLH-NIATv7_16429/TTGACCAT-motif.png",sto, height = 5, width = 7)
+
+sto<- motifToSeqLogo("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/bHLH-NIATv7_16429/CAGTTGACTT-MOTIF.txt") 
+ggsave("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/bHLH-NIATv7_16429/CAGTTGACTT-motif.png",sto, height = 5, width = 7)
+
+
+###Last steps 
+```

@@ -1,0 +1,114 @@
+---
+title: "MakingVisualsNIAT"
+author: "Ashton"
+date: "July 12, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+library(readr)
+library(reshape2)
+```
+
+## HEatmaps
+
+```{r}
+load("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/MA.TopTenThousandSimilarity_GCC.RData", verbose = 3)
+load("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/ma.top10.names.txt")
+
+ma.top25x25 <- read_tsv("E:/AshtonData/MPI_all_data/ThesisWriting/MakingVisuals/ma.corr25.25.txt", col_names = T) %>% select(-Names)
+ma.25genes <- names(ma.top25x25)
+ma.matrix.25 <- as.matrix(ma.top25x25)
+rownames(ma.matrix.25) <- ma.25genes
+
+
+#Lets try hclusting and see what we get
+dd <- as.dist((1-ma.matrix.25)/2)
+hc <- hclust(dd)
+ma.mat.postCluster <- ma.matrix.25[hc$order, hc$order]
+#row.names(ma.mat.postCluster) <- names(ma.mat.postCluster)
+melted.ma.clustered <- melt(ma.mat.postCluster)
+
+
+pdf("ma.25x25correlation.gcc.8.21.pdf")
+heatmap.ma.1 <- ggplot(data = melted.ma.clustered, aes(x=Var1, y = Var2, fill = value)) + geom_tile() + scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0.75, limit = c(0.5,1), name = 'GCC') + theme(axis.text.x = element_text(angle = 90)) + xlab("") + ylab("")
+print(heatmap.ma.1)
+dev.off()
+
+#added this in later- needed to steal the scale for a different graphic.
+tiff("C:/Users/aomda/OneDrive/Documents/Fall 2016/Honors Thesis/From_Nov/Visual_scripts/key-extract_final.tiff", res = 100)
+heatmap.ma.1 <- ggplot(data = melted.ma.clustered, aes(x=Var1, y = Var2, fill = value)) + geom_tile() + scale_fill_gradient2(low = "red", high = "green", mid = "black", midpoint = 0.25, limit = c(-0.5,1), name = 'RCS') + theme(axis.text.x = element_text(angle = 90)) + xlab("") + ylab("")
+print(heatmap.ma.1)
+dev.off()
+
+__________________________________________________________________________________
+#Let's do this for just the top 25. I think that's more meaningful.
+ma.top.25 <- ma.mat %>% select(-X1)
+rownames(ma.top.25) <- names(ma.top.25)
+ma.top.25 <- ma.top.25[1:25, 1:25]
+dd <- as.dist((1-ma.top.25)/2)
+hc.2 <- hclust(dd)
+ma.25.postCluster <- ma.top.25[hc.2$order, hc.2$order]
+row.names(ma.25.postCluster) <- names(ma.25.postCluster)
+
+
+ma.25.postCluster$X1 <- names(ma.25.postCluster)
+ma.25.melted <- melt(ma.25.postCluster)
+
+
+
+
+
+
+
+pdf("ma.25.correlation.gcc3.pdf")
+testPlot <- ggplot(data = ma.25.melted, aes(x=X1, y = variable, fill = value)) + geom_tile() + scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1,1), name = 'GCC') + theme(axis.text.x = element_text(angle = 90)) + xlab("") + ylab("")
+print(testPlot)
+dev.off()
+
+
+
+```
+Let's try the heatmap based on the RNA seq data
+```{r}
+
+rna.top.25 <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/rna.top25genes.txt", col_names = F) %T>% print()
+rna.top.25.gcc <- read_tsv("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/rna.top25genecorrelations.txt", col_names = F)
+rna.top.25.gcc <- matrix(rna.top.25.gcc$X1,nrow = 25)
+row.names(rna.top.25.gcc) <- rna.top.25$X1
+colnames(rna.top.25.gcc) <- rna.top.25$X1
+rna.melt.t <- melt(rna.top.25.gcc)
+
+
+
+#Lets try hclusting and see what we get
+dd.rna <- as.dist((1-rna.top.25.gcc)/2)
+hc.rna <- hclust(dd)
+rna.postCluster <- rna.top.25.gcc[hc.rna$order, hc.rna$order]
+rna.melt.clusterd <- melt(rna.postCluster)
+
+pdf("rna.correlation.gcc2.pdf")
+testPlot <- ggplot(data = rna.melt.clusterd, aes(x=Var1, y = Var2, fill = value)) + geom_tile() + scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1,1), name = 'GCC') + theme(axis.text.x = element_text(angle = 90)) + xlab("") + ylab("")
+print(testPlot)
+dev.off()
+
+
+
+pdf("rna.correlation.gcc1.pdf")
+testPlot <- ggplot(data =rna.melt.t, aes(x=Var1, y = Var2, fill = value)) + geom_tile()
+print(testPlot)
+dev.off()
+
+```
+
+Next thing we want to do is to look at the top sub- modules in the output, and produce heatmaps for their correlation (!)
+```{r}
+#WAS THIS SIGNED OR UNSIGNED?
+load("C:/Users/aomda/OneDrive/Documents/Summer 2016/MakingVisuals/TopTenThousandGenes.RData", verbose = 3)
+#.... I guess we can't use this if its unisigned. So we need to re-run the top thing.... Or at least see 
+
+```
