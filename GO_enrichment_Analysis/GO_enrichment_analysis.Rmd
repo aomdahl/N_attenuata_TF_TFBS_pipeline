@@ -1,0 +1,77 @@
+---
+title: "GO_enrichment_analysis"
+author: "Ashton Omdahl"
+date: "April 13, 2018"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(magrittr)
+```
+#Go Enrichment Analysis
+First let's look at the MA modules
+```{r}
+setwd("D:/AshtonData/MPI_all_data/GO_enrichment_analysis")
+ma_go_terms <- read_tsv("ma_go_genes_modules.tsv") %T>% print()
+ma_go_terms %>% count(Module, GO_ID) %>% arrange(desc(n)) -> ma_go_term_counts
+hist(ma_go_term_counts$n,breaks = seq(0,300,by=10))
+
+```
+
+First let's look at the RNA-seq modules
+```{r}
+setwd("D:/AshtonData/MPI_all_data/GO_enrichment_analysis")
+RNA_go_terms <- read_tsv("rna_go_genes_modules.tsv") %T>% print()
+RNA_go_terms %>% count(Module, GO_ID) %>% arrange(desc(n)) -> RNA_go_term_counts
+hist(RNA_go_term_counts$n, breaks = seq(0,300,by=10))
+
+```
+
+So it looks like most go_terms appear pretty arbitrarily, but some very few are enriched.
+##Permutation testing
+We want to pick ones that are statistically significant for the population. To determine this, we need to do some classy permutation testing (!).
+To do this, I constructed a script 'GO_enrichment_analysis.R.'
+
+Now, to see if any of our enrichment calculations actually were significant in someway.
+
+First, let's read in the sizes
+```{r}
+rna_module_sizes <- data.frame("Module" =c("turquoise", "blue", "brown", "yellow", "green", "red", "black", "pink", "magenta", "purple", "greenyellow", "tan", "salmon", "cyan", "midnightblue", "lightcyan", "lightgreen", "lightyellow", "royalblue", "darkred", "darkgreen", "darkturquoise", "darkgrey", "orange", "darkorange", "white", "skyblue", "saddlebrown", "paleturquoise", "steelblue", "violet", "gre60"), "Size" = c(999, 982, 908, 846, 784, 749, 667, 604, 578, 526, 473, 279, 273, 148, 131, 119, 101, 74, 73, 72, 63, 58, 54, 51, 47, 45, 40, 38, 35, 35, 34, 114))
+MA_module_sizes <- data.frame("Module" = c("turquoise", "blue", "brown", "yellow", "green", "red", "black", "pink", "magenta", "purple", "greenyellow", "tan", "salmon", "cyan", "midnightblue", "lightcyan", "lightgreen", "lightyellow", "royalblue", "darkred", "darkgreen", "darkturquoise", "darkgrey", "orange", "darkorange", "white", "skyblue", "saddlebrown", "steelblue", "paleturquoise", "violet", "darkolivegreen", "darkmagenta", "grey60"), "Size" = c(946, 829, 790, 780, 677, 577, 552, 432, 379, 370, 362, 337, 328, 245, 213, 206, 173, 156, 128, 127, 119, 113, 112, 110, 106, 106, 100, 97, 77, 70, 66, 58, 53, 206))
+```
+
+So now, for a given module, we want to 
+```{r}
+inner_join(RNA_go_term_counts, rna_module_sizes, by = c("Module")) %>% rename("ModuleSize" = Size) -> rna_enrichment_sizes
+write_tsv(rna_enrichment_sizes, "D:/AshtonData/MPI_all_data/GO_enrichment_analysis/rna_enrichment_sizes.txt")
+#Read in what you want to compare it to
+
+pValReportingRNA <- function(goid, module_name)
+{
+  file_name <- paste0("D:/AshtonData/MPI_all_data/GO_enrichment_analysis/RNA_permutations/rna_", module_name, ".txt")
+  f_in <- read_tsv(file_name)
+  f_in %>% filter(GO_ID == goid) -> sto
+  unlist(as.numeric(sto[-1]),use.names = F) -> sto
+  #Lookup the value
+  lookup_val <- (RNA_go_term_counts %>% filter(Module == module_name, GO_ID == goid))$n
+  val <- sum(sto >= lookup_val)
+  val/1000
+}
+rna_p_vals <- rna_enrichment_sizes %>% filter(n>=50) %>% mutate("pval" = 
+
+                                                                   
+```
+So I got it to run in a script I want, but let's test it some more.
+Yellow has 151 genes enriched with the GO:0006412 GO term. How likely is that by random chance?
+```{r}
+rna_yellow <- read_tsv("D:/AshtonData/MPI_all_data/GO_enrichment_analysis/RNA_permutations/rna_yellow.txt")
+rna_yellow %>% filter(GO_ID == "GO:0006412")-> yellow_t
+as.numeric(yellow_t[-1]) -> yellow_t
+sum(yellow_t > 151)
+summary(yellow_t)
+```
+
+This means that none of the permutations had this many, so its highly unlikely that it just random chance. WHOHOOO!
