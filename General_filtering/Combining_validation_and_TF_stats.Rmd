@@ -1,0 +1,161 @@
+---
+title: "Combining_validation_and_TF_stats"
+author: "Ashton Omdahl"
+date: "April 7, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(magrittr)
+```
+# Combining Validation Results with Initial TF Results
+In this script, we will combine results from confirmed motifs from back-validation with TF lists. The focus is to identify which metrics are useful in identifying potentially promising TF-TFBS pairs for testing.
+
+We begin by reading in the key data sets we are interested in:
+```{r}
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+ma_TFs <- read_tsv("ma.12.29.TF.superTable.remade.tsv") %>% rename(pTF = PutativeTF, pMotif = Put.BindingMotif) %>% separate(pTF,c("pTF"),sep = ".t1")%T>% print()
+
+ma_validated_motifs <- read_tsv("./nofilter_results/nofilter_MA_motifs_validated.tsv") %>% rename(pMotif = Motif) %T>% print()
+```
+Now, to inner join
+```{r}
+combined_MA <- inner_join(x =ma_TFs, y= ma_validated_motifs, by = c("pTF", "pMotif", "ModuleCoreGene", "CoreGeneFam")) %>% select(-PromoterLength.x, pTF_family) %>% rename('TF-MotifMatchScore' = MotifMathScore, 'PromoterLength' =PromoterLength.y, "MotifPVal " = `p-Value`)%>% unique()  %T>% print()
+library(readr)
+write_tsv(combined_MA,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/MA_validated_tfs.tsv" )
+     
+```
+Now, lets just randomly see if there are any relationships that are worth looking at between the metrics captured in the table. I think the right way to do this is with an ANOVA table. But for now, lets just look at correlations.
+```{r}
+cor.test(combined_MA$ValidationMatchScore, combined_MA$ModuleCorrelation)
+cor.test(combined_MA$ValidationMatchScore, as.numeric(combined_MA$`TF-MotifMatchScore`))
+cor.test(combined_MA$ValidationMatchScore, combined_MA$`e-Value`)
+cor.test(combined_MA$ValidationMatchScore, combined_MA$BLASTPercentIdentity)
+cor.test(combined_MA$ValidationMatchScore, combined_MA$WGCNAModuleConnectivity)
+```
+... all as good as random. Thanks for nothing.
+
+##Selecting top-ranking candidates by group
+We need an idea of the right ValidationMatchScore threshold. It needs to be pretty high, since this reflects how well out motif analysis works all the way through.
+```{r}
+hist(combined_MA$ValidationMatchScore, xlab = 'Validation Match Score')
+```
+From this, its clear that 0.8 would be pretty stringent and get rid of most everything.
+Note that choosing 0.75 vs 0.8 nearly doubles the size of the list
+```{r}
+top_tf_MA_choices <- combined_MA %>% filter(ValidationMatchScore >= 0.8)  %>% group_by(pTF, pMotif) %>% top_n(1, ValidationMatchScore) %T>% print()
+
+#We also want to save this, with high conservation scores too.
+write_tsv(top_tf_MA_choices,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/MA_validated_tfs_matchscore_over_80.tsv" )
+```
+Now, we want to see the distribution of all the other statistics
+```{r}
+library(ggplot2)
+ggplot(data = top_tf_MA_choices, aes(`e-Value`)) + geom_histogram() + ggtitle("Significant e-value bias in selection set")
+
+ggplot(data = top_tf_MA_choices, aes(BLASTPercentIdentity)) + geom_histogram() + ggtitle("BLAST Identity Percents")
+
+ggplot(data = top_tf_MA_choices, aes(as.numeric(`TF-MotifMatchScore`))) + geom_histogram() + ggtitle("TF-Motif Match Scores")
+
+ggplot(data = top_tf_MA_choices, aes(ModuleCorrelation)) + geom_histogram() + ggtitle("Correlation of TF with Module")
+
+ggplot(data = top_tf_MA_choices, aes(WGCNAModuleConnectivity)) + geom_histogram() + ggtitle("WGCNA Module Connectivity Scores tell us nothing.")
+
+ggplot(data = top_tf_MA_choices, aes(ConservationScore)) + geom_histogram() + ggtitle("Conversation Scores")
+
+```
+This closer look at WGCNA Connectivity Scores revealed some error. On closer investigation, i looks like the values aren't even right at all. Yikes. I will not be referring to them at all anymore.
+
+Looking at the conservation Score distribution, it looks fairly normal. Biologically, a score of 0.5 means that for every time a given motif appeared in both N. attenuata and S. lycopersium, there are roughly 2 genes with orthologs in the corresponding module.
+Reviewing Yu et al's approach, hthey accepted anything with a statisticaly significant conservation, based on a binomial distribution. We actually permuted a p-value, and so actually know p-values on the true distribution, but only with 1000 replicates. 
+This presents the challenge of identifying the correct conservation score cutoff. Perhaps no cutoff is worthwhile- we just choose ones with higher conservation scores as more reliable (?)
+
+We now repeat the above steps with the RNA-seq result data.
+```{r}
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+rna_TFs <- read_tsv("RNA.8.17.TF.superTable.tsv") %>% rename(pTF = PutativeTF, pMotif = Put.BindingMotif) %>% separate(pTF,c("pTF"),sep = ".t1")%T>% print()
+
+rna_validated_motifs <- read_tsv("./nofilter_results/nofilter_RNASeq_motifs_validated.tsv") %>% rename(pMotif = Motif) %T>% print()
+
+combined_RNA <- inner_join(x =rna_TFs, y= rna_validated_motifs, by = c("pTF", "pMotif", "ModuleCoreGene", "CoreGeneFam")) %>% select(-PromoterLength.x, pTF_family) %>% rename('TF-MotifMatchScore' = MotifLibraryMatchScore, 'PromoterLength' =PromoterLength.y, "MotifPVal " = `p-Value`)%>% unique()  %T>% print()
+library(readr)
+write_tsv(combined_RNA,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/RNASeq_validated_tfs.tsv" )
+```
+
+```{r}
+cor.test(combined_RNA$ValidationMatchScore, combined_MA$ModuleCorrelation)
+cor.test(combined_RNA$ValidationMatchScore, as.numeric(combined_MA$`TF-MotifMatchScore`))
+cor.test(combined_RNA$ValidationMatchScore, combined_MA$`e-Value`)
+cor.test(combined_RNA$ValidationMatchScore, combined_MA$BLASTPercentIdentity)
+cor.test(combined_RNA$ValidationMatchScore, combined_MA$WGCNAModuleConnectivity)
+```
+
+```{r}
+hist(combined_RNA$ValidationMatchScore, xlab = 'Validation Match Score')
+```
+Looks like the 0.8 cutoff is still good 
+```{r}
+top_tf_RNA_choices <- combined_RNA %>% filter(ValidationMatchScore >= 0.8)  %>% group_by(pTF, pMotif) %>% top_n(1, ValidationMatchScore) %T>% print()
+
+write_tsv(top_tf_RNA_choices,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/RNA_validated_tfs_over80.tsv" )
+
+```
+
+Now, we want to see the distribution of all the other statistics
+```{r}
+library(ggplot2)
+ggplot(data = top_tf_RNA_choices, aes(`e-Value`)) + geom_histogram() + ggtitle("Significant e-value bias in selection set")
+
+ggplot(data = top_tf_RNA_choices, aes(BLASTPercentIdentity)) + geom_histogram() + ggtitle("BLAST Identity Percents")
+
+ggplot(data = top_tf_RNA_choices, aes(as.numeric(`TF-MotifMatchScore`))) + geom_histogram() + ggtitle("TF-Motif Match Scores")
+
+ggplot(data = top_tf_RNA_choices, aes(ModuleCorrelation)) + geom_histogram() + ggtitle("Correlation of TF with Module")
+
+ggplot(data = top_tf_RNA_choices, aes(WGCNAModuleConnectivity)) + geom_histogram() + ggtitle("WGCNA Module Connectivity Scores tell us nothing.")
+
+ggplot(data = top_tf_RNA_choices, aes(ConservationScore)) + geom_histogram() + ggtitle("Conversation Scores")
+
+```
+
+4/11
+Today I am selecting the final pTFBS-pTF candidates following the method in the paper:"chose teh TF with teh predicted TFBS best matching the given pTFBS as teh cognate TF of the give pTFBS." Ties will be decided by higher conservation score, and then module correlation scores, in that order. If ties then appear for TFs with highly similar binding motifs, the motif with the higher match score will be retained.
+```{r}
+finalized_RNA <- combined_RNA %>% filter(ValidationMatchScore >= 0.8)  %>% unique() %>% group_by(pMotif) %>% top_n(1, ValidationMatchScore) %>% group_by(pMotif) %>% top_n(1,`ConservationScore`)
+write_tsv(finalized_RNA,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_RNA.tsv" )
+
+finalized_MA <- combined_MA %>% filter(ValidationMatchScore >= 0.8)  %>% unique() %>% group_by(pMotif) %>% top_n(1, ValidationMatchScore) %>% group_by(pMotif) %>% top_n(1,`ConservationScore`)
+write_tsv(finalized_MA,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_MA.tsv" )
+
+#doing a combined one (had to take outputs and combine the manually)
+combined_finalized <- read_tsv("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_combined.tsv.txt") %>% group_by(pMotif)%>% top_n(1, ValidationMatchScore) %>% ungroup() %>% group_by(pMotif) %>% top_n(1,`ConservationScore`) %>% ungroup()%>% group_by(pTF) %>% top_n(1, `TF-MotifMatchScore`) %>% ungroup() %>% group_by(pTF) %>% top_n(1, `BLASTPercentIdentity`) %>% filter(BLASTPercentIdentity >= 60) %>% select(-WGCNAModuleConnectivity) %>% ungroup() %>% group_by(pTF,Reference_seq) %>% top_n(1, ValidationMatchScore) %>% group_by(pTF) %>% top_n(1,ValidationMatchScore) 
+
+
+
+combined_finalized_t1 <- read_tsv("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_combined.tsv.txt") %>% group_by(pTF)%>% top_n(1, ValidationMatchScore) %>% ungroup() %>% group_by(pMotif) %>% top_n(1,`ConservationScore`) %>% ungroup() %>% filter(BLASTPercentIdentity >= 60) %>% select(-WGCNAModuleConnectivity) %>% group_by(pTF) %>% top_n(1, `TF-MotifMatchScore`) %>% ungroup() %T>% print()
+  write_tsv(combined_finalized_t1,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_combined_FILTERED_alt.txt" )
+
+combined_finalized_4_20 <- read_tsv("E:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_combined.tsv.txt") %>% group_by(pMotif)%>% top_n(1, ValidationMatchScore) %>% ungroup() %>% group_by(pMotif) %>% top_n(1,`ConservationScore`) %>% ungroup()%>% group_by(pTF) %>% top_n(1, `TF-MotifMatchScore`) %>% ungroup() %>% group_by(pTF) %>% top_n(-1, `e-Value`) %>% filter(BLASTPercentIdentity >= 50) %>% select(-WGCNAModuleConnectivity) %>% ungroup() %>% group_by(pTF,Reference_seq) %>% top_n(1, ValidationMatchScore) %>% group_by(pTF) %>% top_n(1,ValidationMatchScore) %>% top_n(1,ConservationScore)
+
+write_tsv(combined_finalized_4_20,"E:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_combined_4_20.txt" )
+
+
+
+write_tsv(combined_finalized,"D:/AshtonData/MPI_all_data/SummaryFiles_8-17/top_motifs_combined_FILTERED.txt" )
+#From here, I manually chose teh one with the better
+
+```
+I wonder, how many are overlapping between the sets?
+```{r}
+intersect(unique(finalized_MA$pTF), unique(finalized_RNA$pTF))
+```
+
+Let's take a look at the conservation scores here
+```{r}
+hist(combined_finalized$ConservationScore)
+sum(combined_finalized$ConservationScore >= 0.5)
+```

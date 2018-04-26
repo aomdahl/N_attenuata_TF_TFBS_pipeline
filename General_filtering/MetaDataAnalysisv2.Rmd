@@ -1,0 +1,152 @@
+---
+title: "Comparing the metadata
+output: html_document
+---
+Ashton Omdahl  
+
+##Load the relevant libraries  
+```{r "setup", include = FALSE}
+library(knitr)
+opts_knit$set(root.dir = "D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+library("readr")
+library("tidyr")
+library("dplyr")
+library("ggplot2")
+library("magrittr")
+
+```
+
+Import the data, keep just what we are interested in
+```{r}
+getwd()
+
+TF.MA <- read_tsv("ma.12.29.TF.superTable.remade.tsv") %>% print()
+TF.RNASEQ <- read_tsv("RNA.8.17.TF.superTable.tsv") %>% print()
+```
+
+We are doing this a little differently than last time, since we have learned somethings. We want to keep only the highest conserved regions for each (top conservation scores)
+###MicroArray Top Conserved Motifs
+```{r}
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+MA.motifData <-read_tsv("ma.8.17.motifs.superTable.tsv")
+hist(MA.motifData$ConservationScore)
+summary(MA.motifData$ConservationScore)
+qplot(MA.motifData$`ConservationP-value`)
+
+
+#there are 8754 total entries; if we select all those over 0.5, we get 910.
+#selecting by statistical significance we still get 903. Pretty good.
+MA.motif.topCandidates <- MA.motifData %>% filter(ConservationScore > 0.5) %>% filter(`ConservationP-value` <= 0.001)
+#365 unique modules and errors covered. Pretty good.
+group_by(MA.motif.topCandidates, ModuleCoreGene) %>% summarize()
+```
+
+
+Repeating this for the RNA dataset
+#RNA-Seq Top Consered Motifs
+```{r}
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+RNA.motifData <-read_tsv("RNA.8.17.motifs.superTable.tsv")
+hist(MA.motifData$ConservationScore)
+summary(MA.motifData$ConservationScore)
+qplot(MA.motifData$`ConservationP-value`, geom='histogram')
+#This gives us 810 likely candidates
+RNA.motif.topCandidates <- RNA.motifData %>% filter(ConservationScore > 0.5) %>% filter(`ConservationP-value` <= 0.001)
+#Covers 312 unique modules. Pretty good.
+group_by(RNA.motif.topCandidates, ModuleCoreGene) %>% summarize()
+```
+###Core module genes that appear in both datasets
+Curiosity: are there any of the module core genes that overlap? 
+That is to say, do any of the dataests identify the same core genes
+that also are associated wiith statistically significant motifs we identified?
+
+```{r}
+intersect(RNA.motif.topCandidates$ModuleCoreGene, MA.motif.topCandidates$ModuleCoreGene) %>% unique() -> overlappingCoreGenes
+summary(overlappingCoreGenes)
+
+#There are 134 modules that have the samre core genes and have highly conserved motifs
+p1 <- RNA.motif.topCandidates %>% filter(ModuleCoreGene %in% overlappingCoreGenes)%>% filter(ModuleCoreGene != "ERROR") %>% select(Motif, ModuleCoreGene, CoreGeneFam) %>% arrange(ModuleCoreGene) %>% rename(RNA.motifs = Motif)
+summary(p1)
+p2 <- MA.motif.topCandidates %>% filter(ModuleCoreGene %in% overlappingCoreGenes) %>% filter(ModuleCoreGene != "ERROR") %>% select(Motif, ModuleCoreGene, CoreGeneFam) %>% arrange(ModuleCoreGene) %>% rename(MA.motifs = Motif) 
+summary(p2)
+#, MA.Core = ModuleCoreGene, MA.CFam = CoreGeneFam)
+candidateOverlapMotifs_check <- inner_join(p1, p2)
+summary(candidateOverlapMotifs_check)
+
+```
+Yes- there are 135 different modules that had the same. That is alot- nearly half.That suggests that there are a signifiant number of gene families that have highly conserved motifs.
+A manual search reveals some of them do indeed have highly similar patterns.
+In the future, it may be interesting to see what strings are similar both within a datatype as well as across datatypes. I have specified the package and functions to do so below, for future reference
+```{r}
+#To get biostrings:
+#source("https://bioconductor.org/biocLite.R")
+#biocLite("Biostrings")
+library("Biostrings")
+pairwiseAlignment(pattern = c("succeed", "precede"), subject = "supersede", type = "local")
+```
+So, the next few steps:
+> I want to see how similar identified strings are across
+  *I guess in some ways this is analagous to seeing what TFs are identified that are teh same across, isn't it?
+> See what TFs are identified that are associated with those specific motifs
+  
+For now, let's see what TFs are associated with these, both individually as separate datasets and together
+```{r}
+#Doing it for RNA-seq first, cuz the microarray ones didn't come out right.
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+RNA.TF_Data <-read_tsv("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/RNA.8.17.TF.superTable.tsv")
+#Keep all the TFs associated with statistically conserved motifs.
+#We want the core module gene and the motifs to match
+RNA.motif.topCandidates.CoreGene_Motif <- RNA.motif.topCandidates %>% select(Motif, ModuleCoreGene) %>% mutate("Key" = paste0(Motif, "_", ModuleCoreGene))
+RNA.TF.fromConservedMotifs <- RNA.TF_Data %>% mutate("id" = paste0(`Put.BindingMotif`, "_", ModuleCoreGene)) %>% filter(id %in% RNA.motif.topCandidates.CoreGene_Motif$Key)
+summary(RNA.TF.fromConservedMotifs)
+length(unique(RNA.TF.fromConservedMotifs$PutativeTF))
+```
+After this step, we only have 256 unique TFs to work with. We want to probably keep those that have decent correlation scores, motif match scores and Module connectivity scores.
+AFter reviewing the data, we chose 0.75 as the cutoff for all of them.
+```{r}
+
+RNA.TF.fromConservedMotifs.TopCandidates <- RNA.TF.fromConservedMotifs %>% filter(MotifLibraryMatchScore >= 0.75) %>% mutate("NonsignCorrelation" = abs(ModuleCorrelation)) %>% filter(NonsignCorrelation >= 0.75) %>% filter(ModuleExpressionScore >= 0.75, BLASTPercentIdentity >= 50) %>% select(-id, NonsignCorrelation) %>% mutate("id" = paste0(PutativeTF, "_", ModuleCoreGene, "_", `Put.BindingMotif`)) 
+
+write_tsv(RNA.TF.fromConservedMotifs.TopCandidates, "D:/AshtonData/MPI_all_data/SummaryFiles_8-17/TopRNATFCandidates_1_6_18.tsv")
+unique(RNA.TF.fromConservedMotifs.TopCandidates$id)
+
+```
+This file we just saved contains a list of likely TFs, their associated module, and putative binding site (based on the RNA data). 
+In excel, I used the ID column to keep only unique TFs (i.e. one association of the TF with a core module gene.) This identified 159 TF-TFBS pairs that are associated with a specific module. BOOM BABY. Filename: "RNATF_fromTopMotifs_NoRepeats_filtered.xlsx")
+[Note that there were only 3 duplicates, that is cases where a module identified the same TF with the same motif more than once (?)]
+
+##REpeating thsi analysis for the MA data
+```{r}
+
+setwd("D:/AshtonData/MPI_all_data/SummaryFiles_8-17/")
+#Keep all the TFs associated with statistically conserved motifs.
+#We want the core module gene and the motifs to match
+MA.motif.topCandidates.CoreGene_Motif <- MA.motif.topCandidates %>% select(Motif, ModuleCoreGene) %>% mutate("Key" = paste0(Motif, "_", ModuleCoreGene))
+MA.TF.fromConservedMotifs <-TF.MA %>% mutate("id" = paste0(`Put.BindingMotif`, "_", ModuleCoreGene)) %>% filter(id %in% MA.motif.topCandidates.CoreGene_Motif$Key)
+summary(MA.TF.fromConservedMotifs)
+length(unique(MA.TF.fromConservedMotifs$PutativeTF))
+
+```
+______
+This gives us 301 unique TFs to work with from the MA data. Now for filtering. 
+```{r}
+MA.TF.fromConservedMotifs <- MA.TF.fromConservedMotifs %>% rename(MotifLibraryMatchScore= MotifMathScore, ModuleExpressionScore = WGCNAModuleConnectivity)
+
+MA.TF.fromConservedMotifs.TopCandidates <- MA.TF.fromConservedMotifs %>% filter(MotifLibraryMatchScore >= 0.75) %>% mutate("NonsignCorrelation" = abs(ModuleCorrelation)) %>% filter(NonsignCorrelation >= 0.75) %>% filter(ModuleExpressionScore >= 0.75, BLASTPercentIdentity >= 50) %>% select(-id, NonsignCorrelation) %>% mutate("id" = paste0(PutativeTF, "_", ModuleCoreGene, "_", `Put.BindingMotif`)) 
+
+write_tsv(MA.TF.fromConservedMotifs.TopCandidates, "D:/AshtonData/MPI_all_data/SummaryFiles_8-17/TopMATFCandidates_1_6_18.tsv")
+unique(MA.TF.fromConservedMotifs.TopCandidates$id)
+
+```
+I took the written out file and removed duplicates using excel (finding repeats, and just getting rid of them) Filename: "MA_TF_fromTopMotifs_NoRepeats_filtered.xlsx")
+
+next STEP:
+> Do the same thing for the MA data
+  Run on 1/6/2018
+> Check and make sure we aren't getting repeats of highly similar motifs
+  Removed dub
+> Write it up
+> Call it good.
+
+
+
