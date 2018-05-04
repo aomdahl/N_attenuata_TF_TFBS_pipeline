@@ -35,6 +35,41 @@ def combineMotifFilesBySeq(motif_seq, grep_file, outfile):
     except:
         print("unxpected error on" + grep_file)
 
+        #This is meant to work better, since the first time it failed.
+def PureExtract(motif_seq, search_file, outfile):
+    data_list = []
+    with open(search_file, 'r') as f_stream:
+        
+        extracting = False
+        for line in f_stream:
+            
+            line = line.strip()
+            if ">" in line:
+                seq = line.split()[0]
+                #print(search_file)
+                #print(outfile)
+                #print(seq)
+                #print(motif_seq)
+                #input()
+                if seq == (">" + motif_seq):
+                    extracting = True
+                else:
+                    extracting = False
+            if not line:
+                extracting = False
+                continue
+            if extracting:
+                data_list.append(line)
+                #print("Extracting", line)
+   """ if len(data_list) <= 1:
+        #print(data_list)
+        return"""
+    with open(outfile, "a") as o_stream:
+        for e in data_list:
+            o_stream.write(e + '\n')
+
+
+
 def combineMotifFiles(thing_one, thing_two, outfile):
     try:
         os.system("cat " +  thing_one +">> " + outfile)
@@ -61,10 +96,19 @@ def CreateNewDir(par_path, name):
 
 #Gets the reference directory relative to aTf we want.
 def GetReferenceDirectory(ref_dir, tf):
-    dir_list = os.listdir(ref_dir)
-    for r in dir_list:
-        if tf in r:
-            return ref_dir + "/" + r, r
+     try:
+        dir_list = os.listdir(ref_dir)
+        for r in dir_list:
+            if tf in r:
+                return ref_dir + "/" + r, r
+        return -1, -1
+     except TypeError:
+        #this means that the modele was not made
+        print(ref_dir)
+        print ("No module data exists for",tf)
+        return -1, -1     
+    
+
 
         
 
@@ -100,21 +144,23 @@ if __name__ == '__main__':
                         continue
 
                     if search_key in dir_list: 
+                        ref_dir, tf_id = GetReferenceDirectory(args.refDir, p_tf)
+                        if ref_dir == -1 and tf_id == -1:
+                            continue
+
+
                         CreateNewDir(args.outFileDest, dir_name_out)
                         #grep out the motifs that we want, and put it in a file
                         outfile_name = args.outFileDest + "/" +dir_name_out +"/"
-                        outfile_name_query = outfile_name + search_key + "_filtered_for_comparison.motif"
+                        outfile_name_query = outfile_name + search_key + "%_filtered_for_comparison.motif"
                         file_name_1kb = args.dataDir +"/" + search_key + "/" + "1kb_topMatches.motif"
                         file_name_2kb = args.dataDir +"/" + search_key + "/" + "2kb_topMatches.motif"
-                        combineMotifFilesBySeq(p_motif, file_name_1kb, outfile_name_query)
-                        combineMotifFilesBySeq(p_motif, file_name_2kb, outfile_name_query)
+                        #combineMotifFilesBySeq(p_motif, file_name_1kb, outfile_name_query.replace("#", "1kb"))
+                        #combineMotifFilesBySeq(p_motif, file_name_2kb, outfile_name_query.replace("#", "2kb"))
+                        PureExtract(p_motif, file_name_2kb, outfile_name_query.replace("%", "_2kb"))
+                        PureExtract(p_motif, file_name_1kb, outfile_name_query.replace("%", "_1kb"))
                         #now get the information for the reference motifs
-                        try:
-                            ref_dir, tf_id = GetReferenceDirectory(args.refDir, p_tf)
-                        except TypeError:
-                            #this means that the modele was not made
-                            print ("No module data exists for", p_tf)
-                            continue
+                        combineMotifFiles(outfile_name_query.replace("%", "_2kb"),outfile_name_query.replace("%", "_1kb"),outfile_name_query.replace("%", "_all"))
 
                         outfile_name_ref = outfile_name + "/" + tf_id + "_ref.motif"
                         file_name_1kb_ref = ref_dir +"/" + "1kb_topMatches.motif"
