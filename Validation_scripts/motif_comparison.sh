@@ -18,7 +18,8 @@ for d in ./* ; do
 		echo $d
 		sed -i '/^$/d' ./*filtered_for_comparison.motif
 		sed -i '/^$/d' ./*_ref.motif
-		compareMotifs.pl ./*filtered_for_comparison.motif ./ -known ./*_ref.motif -reduceThresh 0.9
+		#compareMotifs.pl ./*filtered_for_comparison.motif ./ -known ./*_ref.motif -reduceThresh 0.9
+		compareMotifs.pl ./*_all_filtered_for_comparison.motif ./ -known ./*_ref.motif -reduceThresh 0.9
 		cd ../
 	fi
 done
